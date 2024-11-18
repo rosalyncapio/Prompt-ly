@@ -1,5 +1,5 @@
 <?php
-defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
+defined('PREVENT_DIRECT_ACCESS') or exit('No direct script access allowed');
 /**
  * ------------------------------------------------------------------
  * LavaLust - an opensource lightweight PHP MVC Framework
@@ -35,17 +35,19 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
  * @license https://opensource.org/licenses/MIT MIT License
  */
 
- /**
-  * Auth Class
-  * This will be remove in version 2.5
-  * It can still be used then as independent library
-  */
-class Lauth {
+/**
+ * Auth Class
+ * This will be remove in version 2.5
+ * It can still be used then as independent library
+ */
+class Lauth
+{
 
-	private $LAVA;
+	public $LAVA;
 
-	public function __construct() {
-		$this->LAVA =& lava_instance();
+	public function __construct()
+	{
+		$this->LAVA = &lava_instance();
 		$this->LAVA->call->database();
 		$this->LAVA->call->library('session');
 	}
@@ -58,7 +60,7 @@ class Lauth {
 	public function passwordhash($password)
 	{
 		$options = array(
-		'cost' => 4,
+			'cost' => 4,
 		);
 		return password_hash($password, PASSWORD_BCRYPT, $options);
 	}
@@ -71,18 +73,18 @@ class Lauth {
 	 * @param  string $usertype   Usertype
 	 * @return $this
 	 */
-	public function register($username, $email, $password, $email_token)
+	public function register($username, $email, $password, $verification_code)
 	{
 		$this->LAVA->db->transaction();
 		$data = array(
 			'username' => $username,
 			'password' => $this->passwordhash($password),
 			'email' => $email,
-			'email_token' => $email_token
+			'verification_code' => $verification_code
 		);
 
 		$res = $this->LAVA->db->table('users')->insert($data);
-		if($res) {
+		if ($res) {
 			$this->LAVA->db->commit();
 			return $this->LAVA->db->last_id();
 		} else {
@@ -98,17 +100,15 @@ class Lauth {
 	 * @return string Validated Username
 	 */
 	public function login($email, $password)
-	{				
-    	$row = $this->LAVA->db
-    					->table('users') 					
-    					->where('email', $email)
-    					->get();
-		if($row) {
-			if(password_verify($password, $row['password'])) {
-					return $row['id'];
-			} else {
-				return false;
-			}
+	{
+		$row = $this->LAVA->db
+			->table('users')
+			->where('email', $email)
+			->get();
+		if ($row && password_verify($password, $row['password'])) {
+			return $row; // Return user details including role
+		} else {
+			return false;
 		}
 	}
 
@@ -118,32 +118,40 @@ class Lauth {
 	 * @param string $password
 	 * @return void
 	 */
-	public function change_password($password) {
+	public function change_password($password)
+	{
 		$data = array(
-					'password' => $this->passwordhash($password)
-				);
+			'password' => $this->passwordhash($password)
+		);
 		return  $this->LAVA->db
-					->table('users')
-					->where('user_id', $this->get_user_id())
-					->update($data);
+			->table('users')
+			->where('user_id', $this->get_user_id())
+			->update($data);
 	}
 
 	/**
 	 * Set up session for login
 	 * @param $this
 	 */
-	public function set_logged_in($user_id) {
-		$session_data = hash('sha256', md5(time().$this->get_user_id()));
+	public function set_logged_in($user_id, $role)
+	{
+		$session_data = hash('sha256', md5(time() . $user_id));
 		$data = array(
 			'user_id' => $user_id,
-			'browser' => $_SERVER['HTTP_USER_AGENT'],
-			'ip' => $_SERVER['REMOTE_ADDR'],
 			'session_data' => $session_data
 		);
-		$res = $this->LAVA->db->table('sessions')
-				->insert($data);
-		if($res) $this->LAVA->session->set_userdata(array('session_data' => $session_data, 'user_id' => $user_id, 'logged_in' => 1));
+
+		$res = $this->LAVA->db->table('sessions')->insert($data);
+		if ($res) {
+			$this->LAVA->session->set_userdata([
+				'session_data' => $session_data,
+				'user_id' => $user_id,
+				'role' => $role, // Store role in session
+				'logged_in' => 1
+			]);
+		}
 	}
+
 
 	/**
 	 * Check if user is Logged in
@@ -153,17 +161,17 @@ class Lauth {
 	{
 		$data = array(
 			'user_id' => $this->LAVA->session->userdata('user_id'),
-			'browser' => $_SERVER['HTTP_USER_AGENT'],
+			// 'browser' => $_SERVER['HTTP_USER_AGENT'],
 			'session_data' => $this->LAVA->session->userdata('session_data')
 		);
 		$count = $this->LAVA->db->table('sessions')
-						->select_count('session_id', 'count')
-						->where($data)
-						->get()['count'];
-		if($this->LAVA->session->userdata('logged_in') == 1 && $count > 0) {
+			->select_count('session_id', 'count')
+			->where($data)
+			->get()['count'];
+		if ($this->LAVA->session->userdata('logged_in') == 1 && $count > 0) {
 			return true;
 		} else {
-			if($this->LAVA->session->has_userdata('user_id')) {
+			if ($this->LAVA->session->has_userdata('user_id')) {
 				$this->set_logged_out();
 			}
 		}
@@ -186,67 +194,70 @@ class Lauth {
 	public function get_username($user_id)
 	{
 		$row = $this->LAVA->db
-						->table('users')
-						->select('username')					
-    					->where('id', $user_id)
-    					->limit(1)
-    					->get();
-    	if($row) {
-    		return html_escape($row['username']);
-    	}
+			->table('users')
+			->select('username')
+			->where('user_id', $user_id)
+			->limit(1)
+			->get();
+		if ($row) {
+			return html_escape($row['username']);
+		}
 	}
 
-	public function set_logged_out() {
+	public function set_logged_out()
+	{
 		$data = array(
 			'user_id' => $this->get_user_id(),
-			'browser' => $_SERVER['HTTP_USER_AGENT'],
+			// 'browser' => $_SERVER['HTTP_USER_AGENT'],
 			'session_data' => $this->LAVA->session->userdata('session_data')
 		);
 		$res = $this->LAVA->db->table('sessions')
-						->where($data)
-						->delete();
-		if($res) {
+			->where($data)
+			->delete();
+		if ($res) {
 			$this->LAVA->session->unset_userdata(array('user_id'));
 			$this->LAVA->session->sess_destroy();
 			return true;
 		} else {
 			return false;
 		}
-		
 	}
 
-	public function verify($token) {
+	public function verify_email($token)
+	{
 		return $this->LAVA->db
-						->table('users')
-						->select('id')
-						->where('email_token', $token)
-						->where_null('email_verified_at')
-						->get();	
+			->table('users')
+			->select('user_id')
+			->where('verification_code', $token)
+			->where('is_verified', 0)
+			->get();
 	}
 
-	public function verify_now($token) {
+	public function verify_now($token)
+	{
 		return $this->LAVA->db
-						->table('users')
-						->where('email_token' ,$token)
-						->update(array('email_verified_at' => date("Y-m-d h:i:s", time())));	
+			->table('users')
+			->where('verification_code', $token)
+			->update(['is_verified' => 1, 'verification_code' => null]);
+	}
 
-	}
-	
-	public function send_verification_email($email) {
+	public function send_verification_email($email)
+	{
 		return $this->LAVA->db
-						->table('users')
-						->select('username, email_token')
-						->where('email', $email)
-						->where_null('email_verified_at')
-						->get();	
+			->table('users')
+			->select('username, verification_code')
+			->where('email', $email)
+			->where_null('email_verified_at')
+			->get();
 	}
-	
-	public function reset_password($email) {
+
+	public function reset_password($email)
+	{
 		$row = $this->LAVA->db
-						->table('users')
-						->where('email', $email)
-						->get();
-		if($this->LAVA->db->row_count() > 0) {
+			->table('users')
+			->where('email', $email)
+			->get();
+		if ($this->LAVA->db->row_count() > 0) {
 			$this->LAVA->call->helper('string');
 			$data = array(
 				'email' => $email,
@@ -255,29 +266,30 @@ class Lauth {
 			$this->LAVA->db
 				->table('password_reset')
 				->insert($data)
-				;
+			;
 			return $data['reset_token'];
 		} else {
 			return FALSE;
 		}
 	}
 
-	public function is_user_verified($email) {
+	public function is_user_verified($email)
+	{
 		$this->LAVA->db
-				->table('users')
-				->where('email', $email)
-				->where_not_null('email_verified_at')
-				->get();
-	return $this->LAVA->db->row_count();
+			->table('users')
+			->where('email', $email)
+			->where_not_null('email_verified_at')
+			->get();
+		return $this->LAVA->db->row_count();
 	}
 
 	public function get_reset_password_token($token)
 	{
 		return $this->LAVA->db
-				->table('password_reset')	
-				->select('email')			
-				->where('reset_token', $token)
-				->get();
+			->table('password_reset')
+			->select('email')
+			->where('reset_token', $token)
+			->get();
 	}
 
 	public function reset_password_now($token, $password)
@@ -287,11 +299,8 @@ class Lauth {
 			'password' => $this->passwordhash($password)
 		);
 		return $this->LAVA->db
-				->table('users')
-				->where('email', $email)
-				->update($data);
+			->table('users')
+			->where('email', $email)
+			->update($data);
 	}
-
 }
-
-?>

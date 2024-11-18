@@ -97,27 +97,32 @@ include APP_DIR . 'views/templates/header.php';
                 <i class="fas fa-user-secret me-2" aria-label="Admin Icon"></i>Admin Panel
             </div>
             <div class="list-group list-group-flush my-3">
-                <a href="#" class="list-group-item list-group-item-action bg-transparent second-text active">
+                <a href="<?= site_url('admin/dashboard') ?>" class="list-group-item list-group-item-action bg-transparent second-text <?= $active_page == 'dashboard' ? 'active' : '' ?>">
                     <i class="fas fa-tachometer-alt me-2" aria-label="Dashboard Icon"></i>Dashboard
                 </a>
-                <a href="<?= site_url('admin/prompts') ?>" class="list-group-item list-group-item-action bg-transparent second-text fw-bold">
+                <a href="<?= site_url('admin/prompts') ?>" class="list-group-item list-group-item-action bg-transparent second-text fw-bold <?= $active_page == 'prompts' ? 'active' : '' ?>">
                     <i class="fas fa-project-diagram me-2" aria-label="Prompts Icon"></i>Prompts
                 </a>
-                <a href="<?= site_url('admin/users') ?>" class="list-group-item list-group-item-action bg-transparent second-text fw-bold">
-                    <i class="fas fa-chart-line me-2" aria-label="Analytics Icon"></i>Users
+                <a href="<?= site_url('admin/users') ?>" class="list-group-item list-group-item-action bg-transparent second-text fw-bold <?= $active_page == 'users' ? 'active' : '' ?>">
+                    <i class="fas fa-users me-2" aria-label="Users Icon"></i>Users
                 </a>
-                <a href="<?= site_url('admin/entries') ?>" class="list-group-item list-group-item-action bg-transparent second-text fw-bold">
-                    <i class="fas fa-paperclip me-2" aria-label="Reports Icon"></i>Entries
+                <a href="<?= site_url('admin/entries') ?>" class="list-group-item list-group-item-action bg-transparent second-text fw-bold <?= $active_page == 'entries' ? 'active' : '' ?>">
+                    <i class="fas fa-file-alt me-2" aria-label="Entries Icon"></i>Entries
                 </a>
-                <a href="<?= site_url('admin/votes') ?>" class="list-group-item list-group-item-action bg-transparent second-text fw-bold">
-                    <i class="fas fa-paperclip me-2" aria-label="Reports Icon"></i>Votes
+                <a href="<?= site_url('admin/votes') ?>" class="list-group-item list-group-item-action bg-transparent second-text fw-bold <?= $active_page == 'votes' ? 'active' : '' ?>">
+                    <i class="fas fa-vote-yea me-2" aria-label="Votes Icon"></i>Votes
                 </a>
-                <a href="<?= site_url('logout') ?>" class="list-group-item list-group-item-action bg-transparent text-danger fw-bold">
-
+                <a href="<?= site_url('auth/logout') ?>" class="list-group-item list-group-item-action bg-transparent text-danger fw-bold">
+                    <i class="fas fa-power-off me-2" aria-label="Logout Icon"></i>Logout
+                </a>
             </div>
         </div>
+        
+        <!-- Page Content -->
+        <div id="page-content-wrapper">
+            <!-- Add your page content here -->
+        </div>
     </div>
-    
 </body>
 
 </html>

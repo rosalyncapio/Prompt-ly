@@ -135,7 +135,6 @@
                 </div>
                 <div id="passwordErrorMessage" class="password-error"></div>
                 <div id="passwordHelpBlock" class="form-text mt-1">
-                    <!-- Your password must be 8-20 characters long and include letters, numbers, and at least one special character. -->
                 </div>
             </div>
 

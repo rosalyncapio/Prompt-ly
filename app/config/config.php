@@ -276,6 +276,8 @@ $config['encryption_key'] = '';
 | 'csrf_cookie_name' = The cookie name
 | 'csrf_expire' = The number in seconds the token should expire.
 */
+require 'vendor/autoload.php';
+
 $config['csrf_protection']         = TRUE;
 $config['csrf_exclude_uris']       = array();
 $config['csrf_token_name']         = 'csrf_token';

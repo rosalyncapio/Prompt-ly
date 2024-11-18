@@ -54,33 +54,34 @@ $router->post('login', 'Auth::login');
 $router->get('register', 'Auth::goregister');
 $router->post('register', 'Auth::register');
 $router->get('logout', 'Auth::logout');
+$router->get('auth/verify_email/{verification_code}', 'Auth::verify_email');
+$router->post('auth/verify_email/{verification_code}', 'Auth::login');
 
 // Admin routes
-$router->get('admin/dashboard', 'Dashboard::index');
-$router->get('admin/prompts', 'Prompts::index');
-$router->get('admin/users', 'Users::index');
-$router->get('admin/entries', 'Entries::index');
-$router->get('admin/votes', 'Votes::index');
+$router->get('admin/dashboard', 'Admin::dashboard');
+$router->get('admin/prompts', 'Admin::prompts');
+$router->get('admin/users', 'Admin::users');
+$router->get('admin/entries', 'Admin::entries');
+$router->get('admin/votes', 'Admin::votes');
 
 // Prompts routes
 $router->get('prompts', 'Prompts::index');
-// $router->get('prompts/create', 'Prompts::create');
-// $router->post('prompts/create', 'Prompts::create');
-$router->match('prompts/create', 'Prompts::create', array('GET','POST'));
-$router->match('prompts/edit/{id}', 'Prompts::edit', array('GET','POST'));
+$router->match('prompts/create', 'Prompts::create', ['GET', 'POST']);
+$router->match('prompts/edit/{id}', 'Prompts::edit', ['GET', 'POST']);
 $router->get('prompts/delete/{id}', 'Prompts::delete');
 
 // Users routes
 $router->get('users', 'Users::index');
 $router->get('users/delete/{id}', 'Users::delete');
 
+// Entries routes
 $router->get('entries', 'Entries::index');
-
-$router->get('entries/delete/{id}', 'entries::delete');
+$router->get('entries/delete/{id}', 'Entries::delete');
 
 // Votes routes
 $router->get('votes', 'Votes::index');
-$router->get('votes/create', 'Votes::create');
-$router->post('votes/create', 'Votes::create');
-$router->match('votes/edit/{id}', 'Votes::edit', array('GET','POST'));
+$router->match('votes/create', 'Votes::create', ['GET', 'POST']);
+$router->match('votes/edit/{id}', 'Votes::edit', ['GET', 'POST']);
 $router->get('votes/delete/{id}', 'Votes::delete');
+
+$router->get('users/userpage', 'Users::userpage');

@@ -101,6 +101,36 @@
         .account-link a:hover {
             text-decoration: underline;
         }
+
+        /* Popup Styling */
+        .popup {
+            position: fixed;
+            top: 20%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 20px;
+            background-color: #f44336;
+            color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            z-index: 1000;
+            max-width: 300px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
     </style>
 </head>
 
@@ -120,16 +150,16 @@
             <div class="mb-4">
                 <label for="inputPassword5" class="form-label">Password</label>
                 <div class="input-group">
-                    <input type="password" id="inputPassword5" name="password" class="form-control" minlength="8" required>
+                    <input type="password" id="inputPassword5" name="password" class="form-control" aria-describedby="passwordHelpBlock" minlength="8" required>
                     <button type="button" id="togglePassword" class="input-group-text">
                         <i class="fas fa-eye" id="passwordToggleIcon"></i>
                     </button>
                 </div>
                 <div id="passwordErrorMessage" class="password-error"></div>
-                <div id="passwordHelpBlock" class="form-text mt-1">
-                    <!-- Your password must be at least 8 characters long and include letters, numbers, and special characters. -->
-                </div>
+                <div id="passwordHelpBlock" class="form-text mt-1"></div>
             </div>
+
+
 
             <div class="d-grid">
                 <button type="submit" class="btn btn-primary">Login</button>
@@ -138,7 +168,15 @@
             <div class="account-link">
                 <a href="/register">New here? Sign up today!</a>
             </div>
+            <!-- Popup for Flash Messages -->
+            <div id="popup-message" class="popup hidden">
+                <span id="popup-text"></span>
+                <button onclick="closePopup()" class="close-btn">&times;</button>
+            </div>
         </form>
+
+
+
     </div>
 
     <script>
@@ -170,9 +208,33 @@
             }
         }
 
-        function togglePasswordVisibility() {
-            const passwordInput = document.getElementById("inputPassword5");
-            const passwordToggleIcon = document.getElementById("passwordToggleIcon");
+
+        // Display popup if there's an error message
+        function showPopup(message) {
+            const popup = document.getElementById('popup-message');
+            const text = document.getElementById('popup-text');
+            text.textContent = message;
+            popup.classList.remove('hidden');
+
+            // Hide popup after 5 seconds
+            setTimeout(closePopup, 5000);
+        }
+
+        // Close the popup
+        function closePopup() {
+            document.getElementById('popup-message').classList.add('hidden');
+        }
+        window.onload = function() {
+            <?php if ($this->session->flashdata('error')): ?>
+                showPopup("<?= $this->session->flashdata('error'); ?>");
+            <?php elseif ($this->session->flashdata('success')): ?>
+                showPopup("<?= $this->session->flashdata('success'); ?>");
+            <?php endif; ?>
+        };
+
+        function togglePasswordVisibility(inputId, iconId) {
+            const passwordInput = document.getElementById(inputId);
+            const passwordToggleIcon = document.getElementById(iconId);
 
             if (passwordInput.type === "password") {
                 passwordInput.type = "text";
@@ -184,11 +246,29 @@
                 passwordToggleIcon.classList.add("fa-eye");
             }
         }
+
+        document.getElementById("togglePassword").addEventListener("click", function() {
+            togglePasswordVisibility("inputPassword5", "passwordToggleIcon");
+        });
+
+
+        $(document).ready(function() {
+            <?php if ($this->session->flashdata('success')): ?>
+                toastr.success('<?= $this->session->flashdata('success') ?>');
+            <?php endif; ?>
+
+            <?php if ($this->session->flashdata('error')): ?>
+                toastr.error('<?= $this->session->flashdata('error') ?>');
+            <?php endif; ?>
+        });
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
-        crossorigin="anonymous"></script>
+        crossorigin="anonymous">
+    </script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/toastr@2.1.4/build/toastr.min.js"></script>
 
 </body>
 
