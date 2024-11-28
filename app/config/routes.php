@@ -63,7 +63,8 @@ $router->post('forgot-password', 'Auth::forgot_password');
 $router->get('reset-password/{token}', 'Auth::reset_password');
 $router->post('reset-password/{token}', 'Auth::reset_password');
 
-$router->get('userpage', 'Users::userpage');
+
+
 // Admin routes
 $router->get('admin/dashboard', 'Admin::dashboard');
 $router->get('admin/prompts', 'Admin::prompts');
@@ -91,4 +92,3 @@ $router->match('votes/create', 'Votes::create', ['GET', 'POST']);
 $router->match('votes/edit/{id}', 'Votes::edit', ['GET', 'POST']);
 $router->get('votes/delete/{id}', 'Votes::delete');
 
-$router->get('users/userpage', 'Users::userpage');
