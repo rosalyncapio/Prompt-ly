@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+    <title>Forgot Password</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
@@ -14,7 +14,6 @@
     <style>
         body {
             font-family: 'Poppins', sans-serif;
-            /* background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); */
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -22,7 +21,7 @@
             color: #333;
         }
 
-        .login-container {
+        .forgot-password-container {
             max-width: 400px;
             width: 100%;
             background-color: rgba(255, 255, 255, 0.95);
@@ -31,7 +30,7 @@
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
         }
 
-        .login-container h5 {
+        .forgot-password-container h5 {
             font-size: 1.75rem;
             font-weight: 600;
             margin-bottom: 1.5rem;
@@ -70,21 +69,9 @@
             transform: translateY(-2px);
         }
 
-        .input-group-text {
-            background-color: #edf2f7;
-            border: 1px solid #e2e8f0;
-            border-radius: 0 0.5rem 0.5rem 0;
-        }
-
         .form-text {
             font-size: 0.875rem;
             color: #718096;
-        }
-
-        .password-error {
-            color: #e53e3e;
-            font-size: 0.875rem;
-            margin-top: 0.5rem;
         }
 
         .account-link {
@@ -102,7 +89,6 @@
             text-decoration: underline;
         }
 
-        /* Popup Styling */
         .popup {
             position: fixed;
             top: 20%;
@@ -131,86 +117,49 @@
             font-size: 16px;
             cursor: pointer;
         }
+
+        .description-text {
+            text-align: center;
+            color: #718096;
+            margin-bottom: 2rem;
+            font-size: 0.95rem;
+        }
     </style>
 </head>
 
 <body>
+    <div class="forgot-password-container">
+        <h5>Forgot Password</h5>
+        <p class="description-text">
+            Enter your email address and we'll send you a link to reset your password.
+        </p>
 
-    <div class="login-container">
-        <h5>Welcome Back!</h5>
-        <form action="<?= site_url('login'); ?>" method="post">
+        <form action="<?= site_url('forgot-password'); ?>" method="post">
             <div class="mb-4">
                 <label for="email" class="form-label">Email Address</label>
-                <input type="email" id="email" name="email" class="form-control" aria-describedby="emailHelpBlock" required>
+                <input type="email" id="email" name="email" class="form-control" required>
                 <div id="emailHelpBlock" class="form-text mt-1">
-                    <!-- Please enter your email to log in and access your account. -->
+                    We'll send a password reset link to this email address.
                 </div>
             </div>
-
-            <div class="mb-4">
-                <label for="inputPassword5" class="form-label">Password</label>
-                <div class="input-group">
-                    <input type="password" id="inputPassword5" name="password" class="form-control" aria-describedby="passwordHelpBlock" minlength="8" required>
-                    <button type="button" id="togglePassword" class="input-group-text">
-                        <i class="fas fa-eye" id="passwordToggleIcon"></i>
-                    </button>
-                </div>
-                <div id="passwordErrorMessage" class="password-error"></div>
-                <div id="passwordHelpBlock" class="form-text mt-1"></div>
-            </div>
-
-
 
             <div class="d-grid">
-                <button type="submit" class="btn btn-primary">Login</button>
+                <button type="submit" class="btn btn-primary">Send Reset Link</button>
             </div>
+
             <div class="account-link">
-                <a href="/forgot-password">Forgot Password</a>
-            </div>
-            <div class="account-link">
-                <a href="/register">New here? Sign up today!</a>
-            </div>
-            <!-- Popup for Flash Messages -->
-            <div id="popup-message" class="popup hidden">
-                <span id="popup-text"></span>
-                <button onclick="closePopup()" class="close-btn">&times;</button>
+                <a href="<?= site_url('login'); ?>">Back to Login</a>
             </div>
         </form>
 
-
-
+        <!-- Popup for Flash Messages -->
+        <div id="popup-message" class="popup hidden">
+            <span id="popup-text"></span>
+            <button onclick="closePopup()" class="close-btn">&times;</button>
+        </div>
     </div>
 
     <script>
-        document.getElementById("togglePassword").addEventListener("click", togglePasswordVisibility);
-
-        function validatePassword() {
-            const passwordInput = document.getElementById("inputPassword5");
-            const password = passwordInput.value;
-
-            // Regular expressions for password requirements
-            const specialCharacterRegex = /[!@#\$%\^&\*()_\-+\{\}\|\[\]:;"'<>,\./]/;
-            const numberRegex = /[0-9]/;
-            const uppercaseLetterRegex = /[A-Z]/;
-            const lowercaseLetterRegex = /[a-z]/;
-
-            if (
-                specialCharacterRegex.test(password) &&
-                numberRegex.test(password) &&
-                uppercaseLetterRegex.test(password) &&
-                lowercaseLetterRegex.test(password) &&
-                password.length >= 8
-            ) {
-                document.getElementById("passwordErrorMessage").textContent = "";
-                return true; // Allow form submission
-            } else {
-                document.getElementById("passwordErrorMessage").textContent =
-                    "Your password must be at least 8 characters long and include at least one special character, one number, one uppercase letter, and one lowercase letter.";
-                return false; // Prevent form submission
-            }
-        }
-
-
         // Display popup if there's an error message
         function showPopup(message) {
             const popup = document.getElementById('popup-message');
@@ -226,6 +175,7 @@
         function closePopup() {
             document.getElementById('popup-message').classList.add('hidden');
         }
+
         window.onload = function() {
             <?php if ($this->session->flashdata('error')): ?>
                 showPopup("<?= $this->session->flashdata('error'); ?>");
@@ -233,26 +183,6 @@
                 showPopup("<?= $this->session->flashdata('success'); ?>");
             <?php endif; ?>
         };
-
-        function togglePasswordVisibility(inputId, iconId) {
-            const passwordInput = document.getElementById(inputId);
-            const passwordToggleIcon = document.getElementById(iconId);
-
-            if (passwordInput.type === "password") {
-                passwordInput.type = "text";
-                passwordToggleIcon.classList.remove("fa-eye");
-                passwordToggleIcon.classList.add("fa-eye-slash");
-            } else {
-                passwordInput.type = "password";
-                passwordToggleIcon.classList.remove("fa-eye-slash");
-                passwordToggleIcon.classList.add("fa-eye");
-            }
-        }
-
-        document.getElementById("togglePassword").addEventListener("click", function() {
-            togglePasswordVisibility("inputPassword5", "passwordToggleIcon");
-        });
-
 
         $(document).ready(function() {
             <?php if ($this->session->flashdata('success')): ?>
@@ -271,7 +201,6 @@
     </script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/toastr@2.1.4/build/toastr.min.js"></script>
-
 </body>
 
 </html>

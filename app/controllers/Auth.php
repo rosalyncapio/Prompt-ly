@@ -125,7 +125,82 @@ class Auth extends Controller
             redirect('register');
         }
     }
-
+    public function forgot_password() 
+    {
+        if ($this->form_validation->submitted()) {
+            $email = $this->io->post('email');
+            
+            $reset_token = $this->lauth->reset_password($email);
+            
+            if ($reset_token) {
+                // Send reset password email
+                $mail = new PHPMailer(true);
+                try {
+                    // SMTP configuration
+                    $mail->isSMTP();
+                    $mail->Host = 'smtp.gmail.com';
+                    $mail->SMTPAuth = true;
+                    $mail->Username = 'chronicallyoccurring@gmail.com';
+                    $mail->Password = 'ltox eauw rvzp tlrr';
+                    $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+                    $mail->Port = 587;
+    
+                    // Reset link
+                    $reset_link = site_url('reset-password/' . $reset_token);
+    
+                    // Email content
+                    $mail->setFrom('chronicallyoccurring@gmail.com', 'Promptly');
+                    $mail->addAddress($email);
+                    $mail->isHTML(true);
+                    $mail->Subject = 'Password Reset Request';
+                    $mail->Body = 'Please click the following link to reset your password: <a href="' . $reset_link . '">Reset Password</a>';
+    
+                    $mail->send();
+                    $this->session->set_flashdata('success', 'Password reset instructions have been sent to your email.');
+                    redirect('login');
+                } catch (Exception $e) {
+                    $this->session->set_flashdata('error', 'Could not send reset email. Error: ' . $mail->ErrorInfo);
+                }
+            } else {
+                $this->session->set_flashdata('error', 'Email address not found.');
+            }
+        }
+        
+        $this->call->view('auth/forgot_password');
+    }
+    
+    public function reset_password($token = null) 
+    {
+        if ($token === null) {
+            redirect('login');
+        }
+    
+        $email_data = $this->lauth->get_reset_password_token($token);
+        
+        if (!$email_data) {
+            $this->session->set_flashdata('error', 'Invalid or expired reset token.');
+            redirect('login');
+        }
+    
+        if ($this->form_validation->submitted()) {
+            $password = $this->io->post('password');
+            $confirm_password = $this->io->post('confirm_password');
+    
+            if ($password === $confirm_password) {
+                if ($this->lauth->reset_password_now($token, $password)) {
+                    $this->session->set_flashdata('success', 'Password has been reset successfully. You can now login.');
+                    redirect('login');
+                } else {
+                    $this->session->set_flashdata('error', 'Failed to reset password. Please try again.');
+                }
+            } else {
+                $this->session->set_flashdata('error', 'Passwords do not match.');
+            }
+        }
+    
+        $data['token'] = $token;
+        $this->call->view('auth/reset_password', $data);
+    }
 
 
     public function logout()

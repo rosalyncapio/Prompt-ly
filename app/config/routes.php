@@ -57,6 +57,13 @@ $router->get('logout', 'Auth::logout');
 $router->get('auth/verify_email/{verification_code}', 'Auth::verify_email');
 $router->post('auth/verify_email/{verification_code}', 'Auth::login');
 
+// New password reset routes
+$router->get('forgot-password', 'Auth::forgot_password');
+$router->post('forgot-password', 'Auth::forgot_password');
+$router->get('reset-password/{token}', 'Auth::reset_password');
+$router->post('reset-password/{token}', 'Auth::reset_password');
+
+$router->get('userpage', 'Users::userpage');
 // Admin routes
 $router->get('admin/dashboard', 'Admin::dashboard');
 $router->get('admin/prompts', 'Admin::prompts');

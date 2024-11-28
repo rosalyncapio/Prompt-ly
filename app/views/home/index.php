@@ -10,7 +10,7 @@
     <div class="container mt-5">
         <div class="row justify-content-center">
             <div class="col-md-6 text-center">
-                <h1 class="mb-4">Welcome to Admin Panel</h1>
+                <h1 class="mb-4">Welcome</h1>
                 <div class="d-grid gap-2">
                     <a href="<?= site_url('login') ?>" class="btn btn-primary btn-lg">Login</a>
                     <a href="<?= site_url('register') ?>" class="btn btn-secondary btn-lg">Register</a>
